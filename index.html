@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AI Coach Chạy Bộ - MVP</title>
 
     <!-- Tailwind CDN -->
@@ -123,10 +123,10 @@
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ngày Race (đích đến)</label>
+                    <div class="min-w-0">
+                        <label for="input-race-date" class="block text-xs font-semibold text-slate-600 mb-1">Ngày Race (đích đến)</label>
                         <input type="date" id="input-race-date"
-                               class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                               class="race-date-input w-full border rounded-xl bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
                     </div>
 
                     <button onclick="goToSubOnboard('b')"

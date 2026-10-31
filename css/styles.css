@@ -2,6 +2,8 @@
 
 body {
     font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: hidden;
 }
 
 .tab-content {
@@ -20,6 +22,45 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+/* Native date picker sized for touch screens and preventing iOS zoom */
+.race-date-input {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 16px;
+    line-height: 1.25;
+}
+
+/* iOS Safari zooms focused controls with font size below 16px. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="date"]),
+select {
+    font-size: 16px !important;
+}
+
+.race-date-input::-webkit-date-and-time-value {
+    text-align: left;
+}
+
+@media (min-width: 640px) {
+    .race-date-input {
+        min-height: 48px;
+        padding-inline: 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    main {
+        padding-inline: 12px;
+    }
+
+    #sub-onboard-a > .grid,
+    #sub-onboard-a .grid.grid-cols-4 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 /* Modal backdrop */

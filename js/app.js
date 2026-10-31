@@ -23,10 +23,13 @@ window.addEventListener('DOMContentLoaded', () => {
     initSessionDayLimit();
 
     // Default race date = today + 3 months
-    const futureDate = new Date();
+    const today = new Date();
+    const futureDate = new Date(today);
     futureDate.setMonth(futureDate.getMonth() + 3);
-    document.getElementById('input-race-date').value =
-        futureDate.toISOString().split('T')[0];
+
+    const raceDateInput = document.getElementById('input-race-date');
+    raceDateInput.min = today.toISOString().split('T')[0];
+    raceDateInput.value = futureDate.toISOString().split('T')[0];
 
     // Ensure we start on onboarding step A
     goToSubOnboard('a');
