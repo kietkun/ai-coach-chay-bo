@@ -1,0 +1,41 @@
+/* AI Coach Chạy Bộ - Custom Styles */
+
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Smooth transitions */
+.tab-content {
+    animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Modal backdrop */
+#workout-modal {
+    transition: opacity 0.2s ease;
+}
+
+/* Scrollbar for health questions */
+#health-questions-container::-webkit-scrollbar {
+    width: 4px;
+}
+#health-questions-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+#health-questions-container::-webkit-scrollbar-thumb {
+    background: #c7d2fe;
+    border-radius: 4px;
+}

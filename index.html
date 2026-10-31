@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Coach Chạy Bộ - MVP</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col">
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="bg-indigo-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">🏃‍♂️</span>
+                <h1 class="text-lg font-bold tracking-tight">AI Coach Chạy Bộ</h1>
+            </div>
+            <div id="header-actions" class="hidden">
+                <button onclick="resetApp()"
+                        class="text-xs bg-indigo-700 hover:bg-indigo-800 px-3 py-1.5 rounded-lg font-medium transition">
+                    Làm lại
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="flex-1 max-w-md w-full mx-auto p-4 pb-20">
+
+        <!-- ========== PAGE 1: ONBOARDING ========== -->
+        <section id="step-onboarding" class="tab-content active space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-slate-800">Thiết lập Giáo án AI</h2>
+                    <span id="onboarding-step-indicator"
+                          class="text-xs font-semibold bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full">
+                        Bước 1/3
+                    </span>
+                </div>
+
+                <!-- Sub-step A: Performance & Goals -->
+                <div id="sub-onboard-a" class="space-y-4">
+                    <h3 class="font-semibold text-slate-700 text-sm border-b pb-2">1. Thành tích & Mục tiêu</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Họ tên của bạn (Tùy chọn)</label>
+                        <input type="text" id="input-name" placeholder="Ví dụ: Văn A"
+                               class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Cự ly thành tích gần nhất</label>
+                            <select id="input-recent-dist" class="w-full px-3 py-2 border rounded-xl text-sm bg-white"
+                                    onchange="toggleRecentTimeField()">
+                                <option value="none">Chưa từng thi đấu</option>
+                                <option value="5000" selected>5K</option>
+                                <option value="10000">10K</option>
+                                <option value="21097">HM (21K)</option>
+                                <option value="42195">FM (42K)</option>
+                            </select>
+                        </div>
+                        <div id="recent-time-group">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Thời gian (mm:ss)</label>
+                            <input type="text" id="input-recent-time" placeholder="VD: 25:00"
+                                   class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                   value="25:00" required
+                                   pattern="[0-9]{2}:[0-5][0-9]"
+                                   maxlength="5"
+                                   inputmode="numeric"
+                                   autocomplete="off"
+                                   title="Định dạng mm:ss (ví dụ: 25:00)">
+                        </div>
+                    </div>
+                    <p id="no-race-hint" class="hidden text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-3 py-2">
+                        👋 Bạn chưa có thành tích thi đấu. Hệ thống sẽ dùng mức khởi đầu an toàn (VDOT ≈ 28) phù hợp người mới.
+                    </p>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Mục tiêu cự ly</label>
+                            <select id="input-goal-dist" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                                <option value="5">5 km</option>
+                                <option value="10">10 km</option>
+                                <option value="21">21 km (HM)</option>
+                                <option value="42" selected>42 km (FM)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Mục tiêu thành tích (Tùy chọn)</label>
+                            <input type="text" id="input-goal-time" placeholder="VD: 03:30"
+                                   class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                                   maxlength="5" pattern="[0-9]{2}:[0-5][0-9]" inputmode="numeric"
+                                   autocomplete="off" title="Định dạng xx:xx (ví dụ: 03:30)">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Số buổi chạy/tuần</label>
+                            <select id="input-sessions" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                                <option value="3">3 buổi</option>
+                                <option value="4" selected>4 buổi</option>
+                                <option value="5">5 buổi</option>
+                                <option value="6">6 buổi</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Kinh nghiệm</label>
+                            <select id="input-exp" class="w-full px-3 py-2 border rounded-xl text-sm bg-white">
+                                <option value="new">Người mới</option>
+                                <option value="exp" selected>Có kinh nghiệm</option>
+                                <option value="pro">VĐV</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Ngày Race (đích đến)</label>
+                        <input type="date" id="input-race-date"
+                               class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+
+                    <button onclick="goToSubOnboard('b')"
+                            class="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow-md">
+                        Tiếp theo: Sàng lọc sức khoẻ
+                    </button>
+                </div>
+
+                <!-- Sub-step B: Health Screening -->
+                <div id="sub-onboard-b" class="space-y-4 hidden">
+                    <h3 class="font-semibold text-slate-700 text-sm border-b pb-2">2. Sàng lọc Sức khoẻ (PAR-Q)</h3>
+                    <p class="text-xs text-slate-500">
+                        Vui lòng trả lời trung thực 13 câu hỏi dưới đây để đảm bảo an toàn tập luyện.
+                    </p>
+
+                    <div id="health-questions-container" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        <!-- Questions injected by onboarding.js -->
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                        <button onclick="goToSubOnboard('a')"
+                                class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-xl font-semibold text-sm transition">
+                            Quay lại
+                        </button>
+                        <button onclick="goToSubOnboard('c')"
+                                class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow-md">
+                            Tiếp theo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Sub-step C: Training Philosophy & Free Days -->
+                <div id="sub-onboard-c" class="space-y-4 hidden">
+                    <h3 class="font-semibold text-slate-700 text-sm border-b pb-2">3. Trường phái & Ngày rảnh</h3>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">Trường phái huấn luyện</label>
+                        <select id="input-school" class="w-full px-3 py-2 border rounded-xl text-sm bg-white"
+                                onchange="toggleAgeField()">
+                            <option value="pace">Theo Pace (Khuyên dùng)</option>
+                            <option value="hr">Theo Vùng Nhịp Tim (Heart Rate)</option>
+                        </select>
+                    </div>
+
+                    <div id="age-group" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">
+                            Tuổi của bạn (để tính HRmax = 208 - 0.7 × tuổi)
+                        </label>
+                        <input type="number" id="input-age" placeholder="VD: 32"
+                               class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                               value="30">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">
+                            Ngày rảnh tập luyện trong tuần (Tick chọn các ngày bạn có thể chạy)
+                        </label>
+                        <div class="grid grid-cols-4 gap-2 text-xs font-medium">
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="T2" checked> <span>Thứ 2</span>
+                            </label>
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="T3" checked> <span>Thứ 3</span>
+                            </label>
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="T4"> <span>Thứ 4</span>
+                            </label>
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="T5" checked> <span>Thứ 5</span>
+                            </label>
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="T6"> <span>Thứ 6</span>
+                            </label>
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="T7" checked> <span>Thứ 7</span>
+                            </label>
+                            <label class="flex items-center space-x-1">
+                                <input type="checkbox" name="days" value="CN" checked> <span>Chủ Nhật</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                        <button onclick="goToSubOnboard('b')"
+                                class="w-1/2 bg-slate-200 hover:bg-slate-300 text-slate-700 py-2.5 rounded-xl font-semibold text-sm transition">
+                            Quay lại
+                        </button>
+                        <button onclick="onGeneratePlanClick()"
+                                class="w-1/2 bg-emerald-600 hover:bg-emerald-700 text-white py-2.5 rounded-xl font-semibold text-sm transition shadow-md">
+                            Tạo Giáo Án AI
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== PAGE 2: HEALTH BLOCKED ========== -->
+        <section id="step-health-blocked" class="tab-content space-y-4">
+            <div class="bg-red-50 border border-red-200 p-6 rounded-2xl text-center space-y-4">
+                <div class="text-4xl">🛑</div>
+                <h2 class="text-lg font-bold text-red-700">Cần Khám Sức Khỏe Trước Khi Tập</h2>
+                <p class="text-xs text-red-600 leading-relaxed">
+                    Dựa trên câu trả lời sàng lọc sức khỏe của bạn (có dấu hiệu cờ đỏ liên quan đến tim mạch
+                    hoặc triệu chứng nguy hiểm), hệ thống tạm thời
+                    <strong>chặn việc tạo giáo án tự động</strong>
+                    để đảm bảo an toàn tuyệt đối cho bạn. Vui lòng tham khảo ý kiến bác sĩ và xin giấy xác nhận
+                    trước khi bắt đầu chương trình chạy bộ cường độ cao.
+                </p>
+                <button onclick="onBackFromBlocked()"
+                        class="w-full bg-slate-700 text-white py-2.5 rounded-xl font-semibold text-sm transition">
+                    Quay lại thiết lập
+                </button>
+            </div>
+        </section>
+
+        <!-- ========== PAGE 3: DASHBOARD & PLAN ========== -->
+        <section id="step-dashboard" class="tab-content space-y-4">
+
+            <!-- VDOT Result Card -->
+            <div class="bg-gradient-to-br from-indigo-900 to-indigo-700 text-white p-5 rounded-2xl shadow-md space-y-3">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Chỉ số năng lực</span>
+                        <h2 class="text-3xl font-bold" id="res-vdot">--</h2>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs uppercase tracking-wider text-indigo-300 font-semibold">Đối tượng</span>
+                        <p class="text-sm font-semibold" id="res-runner-type">--</p>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-indigo-600/50 flex justify-between text-xs">
+                    <div>Mục tiêu: <span id="res-goal-str" class="font-bold">--</span></div>
+                    <div>Dự đoán: <span id="res-pred-time" class="font-bold text-emerald-300">Tối ưu VDOT</span></div>
+                </div>
+            </div>
+
+            <!-- Pace / HR Bands -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                    Bảng Vùng Tập Luyện (Pace / HR)
+                </h3>
+                <div class="grid grid-cols-4 gap-2 text-center text-xs">
+                    <div class="bg-slate-50 p-2 rounded-xl border">
+                        <div class="font-bold text-indigo-600">E (Easy)</div>
+                        <div id="pace-e" class="text-slate-700 mt-1 font-medium">--</div>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-xl border">
+                        <div class="font-bold text-indigo-600">T (Tempo)</div>
+                        <div id="pace-t" class="text-slate-700 mt-1 font-medium">--</div>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-xl border">
+                        <div class="font-bold text-indigo-600">I (Interval)</div>
+                        <div id="pace-i" class="text-slate-700 mt-1 font-medium">--</div>
+                    </div>
+                    <div class="bg-slate-50 p-2 rounded-xl border">
+                        <div class="font-bold text-indigo-600">R (Rep)</div>
+                        <div id="pace-r" class="text-slate-700 mt-1 font-medium">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Warning Banners -->
+            <div id="timeline-warning"
+                 class="hidden bg-orange-50 border border-orange-200 p-3 rounded-xl text-xs text-orange-800 flex items-start space-x-2">
+                <span class="text-base">⏳</span>
+                <div>
+                    <strong>Cảnh báo thời gian gấp:</strong>
+                    Ngày race bạn chọn đến quá sớm so với tiêu chuẩn khuyến nghị cho mục tiêu này.
+                    Hãy tập trung giữ gìn thể lực và tránh chấn thương.
+                </div>
+            </div>
+
+            <div id="yellow-warning"
+                 class="hidden bg-amber-50 border border-amber-200 p-3 rounded-xl text-xs text-amber-800 flex items-start space-x-2">
+                <span class="text-base">⚠️</span>
+                <div>
+                    <strong>Lưu ý sức khoẻ (Cờ vàng):</strong>
+                    Khối lượng toàn bộ giáo án đã được hệ thống tự động giảm 10–15% để đảm bảo an toàn cho thể trạng của bạn.
+                </div>
+            </div>
+
+            <div id="heavy-warning"
+                 class="hidden bg-red-50 border border-red-200 p-3 rounded-xl text-xs text-red-800 flex items-start space-x-2">
+                <span class="text-base">🚨</span>
+                <div>
+                    <strong>Cảnh báo quá tải bài nặng:</strong>
+                    Khối lượng bài nặng (Interval/Tempo) đã được hệ thống tự động scale giảm về ngưỡng an toàn 20%.
+                </div>
+            </div>
+
+            <!-- Calendar Plan -->
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800 text-sm">Lịch Giáo Án Theo Tuần</h3>
+                    <span id="total-weeks-label" class="text-xs text-slate-500">-- tuần</span>
+                </div>
+                <div id="calendar-weeks-container" class="space-y-3">
+                    <!-- Weeks injected by dashboard.js -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================== WORKOUT MODAL ===================== -->
+    <div id="workout-modal"
+         class="fixed inset-0 bg-black/50 z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-start border-b pb-3">
+                <div>
+                    <span id="modal-day-badge"
+                          class="text-xs font-semibold bg-indigo-50 text-indigo-600 px-2 py-0.5 rounded-md">--</span>
+                    <h3 id="modal-title" class="text-lg font-bold text-slate-800 mt-1">--</h3>
+                </div>
+                <button onclick="closeModal()"
+                        class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">&times;</button>
+            </div>
+
+            <div class="space-y-3 text-sm">
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Cấu trúc buổi tập</span>
+                    <div id="modal-structure" class="mt-1 p-3 bg-slate-50 rounded-xl space-y-2 text-slate-700">
+                        <!-- Structure injected -->
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Mục tiêu Pace / Nhịp tim</span>
+                    <p id="modal-target" class="font-semibold text-indigo-600 mt-0.5">--</p>
+                </div>
+
+                <div>
+                    <span class="text-xs font-semibold text-slate-500 uppercase">Tại sao có bài này? (Lý do)</span>
+                    <p id="modal-rationale" class="text-slate-600 mt-0.5 text-xs leading-relaxed">--</p>
+                </div>
+
+                <div id="modal-warning-box" class="hidden bg-red-50 border border-red-200 p-3 rounded-xl text-xs text-red-700">
+                    <strong>Cảnh báo an toàn:</strong>
+                    <span id="modal-warning-text">--</span>
+                </div>
+            </div>
+
+            <button onclick="closeModal()"
+                    class="w-full bg-slate-800 hover:bg-slate-900 text-white py-2.5 rounded-xl font-semibold text-sm transition">
+                Đóng
+            </button>
+        </div>
+    </div>
+
+    <!-- ES Module entry -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
