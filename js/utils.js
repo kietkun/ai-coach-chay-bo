@@ -46,6 +46,8 @@ export function switchTab(tabId) {
  * Reset app back to onboarding step 1
  */
 export function resetApp() {
+    localStorage.removeItem('aiCoachDraft');
+    localStorage.removeItem('aiCoachSavedPlan');
     switchTab('step-onboarding');
     // Re-export goToSubOnboard from onboarding module will be called externally
     if (window.goToSubOnboard) {

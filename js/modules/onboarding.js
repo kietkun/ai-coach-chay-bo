@@ -180,6 +180,78 @@ export function toggleAgeField() {
 /**
  * Show / hide recent time field when user selects "Chưa từng thi đấu"
  */
+export function saveOnboardingDraft() {
+    const healthAnswers = {};
+    for (let i = 0; i < 13; i++) {
+        const checked = document.querySelector(`input[name="hq_${i}"]:checked`);
+        healthAnswers[`hq_${i}`] = checked ? checked.value : 'no';
+    }
+
+    const draft = {
+        name: document.getElementById('input-name')?.value || '',
+        recentDist: document.getElementById('input-recent-dist')?.value || '5000',
+        recentTime: document.getElementById('input-recent-time')?.value || '25:00',
+        goalDist: document.getElementById('input-goal-dist')?.value || '42',
+        goalTime: document.getElementById('input-goal-time')?.value || '',
+        sessions: document.getElementById('input-sessions')?.value || '4',
+        exp: document.getElementById('input-exp')?.value || 'exp',
+        raceDate: document.getElementById('input-race-date')?.value || '',
+        school: document.getElementById('input-school')?.value || 'pace',
+        age: document.getElementById('input-age')?.value || '30',
+        freeDays: Array.from(document.querySelectorAll('input[name="days"]:checked')).map(cb => cb.value),
+        healthAnswers
+    };
+
+    localStorage.setItem('aiCoachDraft', JSON.stringify(draft));
+}
+
+export function restoreOnboardingDraft() {
+    const rawDraft = localStorage.getItem('aiCoachDraft');
+    if (!rawDraft) return false;
+
+    try {
+        const draft = JSON.parse(rawDraft);
+        const fields = {
+            'input-name': draft.name,
+            'input-recent-dist': draft.recentDist,
+            'input-recent-time': draft.recentTime,
+            'input-goal-dist': draft.goalDist,
+            'input-goal-time': draft.goalTime,
+            'input-sessions': draft.sessions,
+            'input-exp': draft.exp,
+            'input-race-date': draft.raceDate,
+            'input-school': draft.school,
+            'input-age': draft.age
+        };
+
+        Object.entries(fields).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element && value !== undefined && value !== null) element.value = value;
+        });
+
+        document.querySelectorAll('input[name="days"]').forEach((checkbox) => {
+            checkbox.checked = Array.isArray(draft.freeDays) && draft.freeDays.includes(checkbox.value);
+        });
+
+        Object.entries(draft.healthAnswers || {}).forEach(([name, value]) => {
+            const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+            if (radio) radio.checked = true;
+        });
+
+        toggleRecentTimeField();
+        toggleAgeField();
+        return true;
+    } catch {
+        localStorage.removeItem('aiCoachDraft');
+        return false;
+    }
+}
+
+export function initOnboardingDraftPersistence() {
+    document.addEventListener('input', saveOnboardingDraft);
+    document.addEventListener('change', saveOnboardingDraft);
+}
+
 export function initSessionDayLimit() {
     const sessionsSelect = document.getElementById('input-sessions');
     const dayCheckboxes = Array.from(document.querySelectorAll('input[name="days"]'));

@@ -246,6 +246,11 @@ export function generatePlan(data) {
     }
 
     document.getElementById('total-weeks-label').innerText = `${totalWeeks} tuần`;
+    localStorage.setItem('aiCoachSavedPlan', JSON.stringify({
+        data,
+        totalWeeks,
+        savedAt: new Date().toISOString()
+    }));
     switchTab('step-dashboard');
 }
 
