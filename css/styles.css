@@ -24,15 +24,18 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Native date picker sized for touch screens and preventing iOS zoom */
+/* Native date picker sized for touch screens and preventing iOS/WebKit expansion */
 .race-date-input {
+    display: block;
     box-sizing: border-box;
     width: 100%;
-    max-width: 100%;
+    max-width: 320px;
+    min-width: 0;
     min-height: 44px;
     padding: 10px 12px;
     font-size: 16px;
     line-height: 1.25;
+    -webkit-text-size-adjust: 100%;
 }
 
 /* iOS Safari zooms focused controls with font size below 16px. */
@@ -55,6 +58,10 @@ select {
 @media (max-width: 360px) {
     main {
         padding-inline: 12px;
+    }
+
+    .race-date-input {
+        max-width: 100%;
     }
 
     #sub-onboard-a > .grid,
